@@ -1,291 +1,186 @@
-import { useState, useEffect } from 'react';
-import { motion } from 'motion/react';
-import { 
-  Utensils, 
-  Coffee, 
-  Wine, 
-  IceCream, 
-  ChevronRight,
-  Clock,
-  MapPin,
-  Instagram
-} from 'lucide-react';
-
-// --- Data ---
-const CATEGORIES = [
-  { id: 'entradas', name: 'Entradas', icon: Utensils },
-  { id: 'principales', name: 'Principales', icon: Utensils },
-  { id: 'bebidas', name: 'Bebidas', icon: Wine },
-  { id: 'postres', name: 'Postres', icon: IceCream },
-];
-
-const MENU_ITEMS = {
-  entradas: [
-    {
-      id: 1,
-      name: 'Provoleta Ahumada',
-      description: 'Queso provolone fundido con hierbas frescas y aceite de oliva virgen.',
-      price: 4500,
-      image: 'https://lamafia.es/wp-content/uploads/2024/03/provolone-al-horno.png',
-    },
-    {
-      id: 2,
-      name: 'Empanadas de Lomo',
-      description: 'Cortadas a cuchillo, fritas o al horno de barro. Pack de 2 unidades.',
-      price: 3200,
-      image: 'https://tofuu.getjusto.com/orioneat-local/resized2/ncsBkGghkaXzThvow-2400-x.webp',
-    },
-    {
-      id: 3,
-      name: 'Burrata con Rúcula',
-      description: 'Burrata fresca, tomates cherry confitados y pesto de albahaca.',
-      price: 5800,
-      image: 'https://images.unsplash.com/photo-1594007654729-407eedc4be65?auto=format&fit=crop&q=80&w=400',
-    },
-  ],
-  principales: [
-    {
-      id: 4,
-      name: 'Ojo de Bife 400g',
-      description: 'Corte premium a la parrilla con sal de mar y manteca de chimichurri.',
-      price: 12500,
-      image: 'https://images.unsplash.com/photo-1558030006-450675393462?auto=format&fit=crop&q=80&w=400',
-    },
-    {
-      id: 5,
-      name: 'Risotto de Hongos',
-      description: 'Arroz carnaroli, variedad de hongos silvestres y aceite de trufa.',
-      price: 9800,
-      image: 'https://images.unsplash.com/photo-1476124369491-e7addf5db371?auto=format&fit=crop&q=80&w=400',
-    },
-    {
-      id: 6,
-      name: 'Salmón Rosado',
-      description: 'A la plancha con puré de arvejas y vegetales de estación asados.',
-      price: 14200,
-      image: 'https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&q=80&w=400',
-    },
-  ],
-  bebidas: [
-    {
-      id: 7,
-      name: 'Malbec Reserva',
-      description: 'Copa de vino tinto de la casa, notas de frutos rojos y roble.',
-      price: 3500,
-      image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&q=80&w=400',
-    },
-    {
-      id: 8,
-      name: 'Limonada con Menta',
-      description: 'Fresca, natural, con jengibre y menta fresca.',
-      price: 2200,
-      image: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&q=80&w=400',
-    },
-    {
-      id: 9,
-      name: 'Gin Tonic Botánico',
-      description: 'Gin nacional premium con tónica y rodaja de pomelo.',
-      price: 4800,
-      image: 'https://images.unsplash.com/photo-1551538827-9c037cb4f32a?auto=format&fit=crop&q=80&w=400',
-    },
-  ],
-  postres: [
-    {
-      id: 10,
-      name: 'Volcán de Chocolate',
-      description: 'Corazón fundido con helado de crema americana y frutos del bosque.',
-      price: 3800,
-      image: 'https://images.unsplash.com/photo-1624353365286-3f8d62daad51?auto=format&fit=crop&q=80&w=400',
-    },
-    {
-      id: 11,
-      name: 'Flan Casero',
-      description: 'Con dulce de leche colonial y crema montada.',
-      price: 2900,
-      image: 'https://images.unsplash.com/photo-1528975604071-b4dc52a2d18c?auto=format&fit=crop&q=80&w=400',
-    },
-    {
-      id: 12,
-      name: 'Tiramisú',
-      description: 'Receta tradicional italiana con mascarpone y café espresso.',
-      price: 4200,
-      image: 'https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?auto=format&fit=crop&q=80&w=400',
-    },
-  ],
-};
-
-// --- Components ---
-
-const MenuItem = ({ item }: { item: any }) => (
-  <motion.div 
-    initial={{ opacity: 0, y: 20 }}
-    whileInView={{ opacity: 1, y: 0 }}
-    viewport={{ once: true }}
-    className="flex gap-4 p-4 border-b border-[#1a1a1a]/10 last:border-0 group"
-  >
-    <div className="flex-1">
-      <div className="flex justify-between items-start mb-1">
-        <h3 className="font-serif text-xl font-medium group-hover:text-[#5A5A40] transition-colors">
-          {item.name}
-        </h3>
-        <span className="font-sans font-semibold text-sm whitespace-nowrap ml-2">
-          $ {item.price.toLocaleString('es-AR')}
-        </span>
-      </div>
-      <p className="text-sm text-[#1a1a1a]/60 font-sans leading-relaxed">
-        {item.description}
-      </p>
-    </div>
-    <div className="w-24 h-24 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100">
-      <img 
-        src={item.image} 
-        alt={item.name}
-        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-        referrerPolicy="no-referrer"
-      />
-    </div>
-  </motion.div>
-);
-
-export default function App() {
-  const [activeCategory, setActiveCategory] = useState('entradas');
-  const [isScrolled, setIsScrolled] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 100);
-      
-      // Update active category based on scroll position
-      const sections = CATEGORIES.map(cat => document.getElementById(cat.id));
-      const scrollPosition = window.scrollY + 150;
-
-      for (let i = sections.length - 1; i >= 0; i--) {
-        const section = sections[i];
-        if (section && section.offsetTop <= scrollPosition) {
-          setActiveCategory(CATEGORIES[i].id);
-          break;
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bistró Moderno - Menú</title>
+    <!-- React & ReactDOM (Versiones de producción) -->
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <!-- Babel para procesar JSX en el navegador -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Fuentes -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        serif: ['Playfair Display', 'serif'],
+                    },
+                },
+            },
         }
-      }
-    };
+    </script>
+    
+    <style>
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        body { background-color: #f5f2ed; color: #1a1a1a; margin: 0; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in { animation: fadeIn 0.5s ease-out forwards; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+    <script type="text/babel">
+        const { useState, useEffect } = React;
 
-  const scrollToCategory = (id: string) => {
-    const element = document.getElementById(id);
-    if (element) {
-      const offset = 120;
-      const bodyRect = document.body.getBoundingClientRect().top;
-      const elementRect = element.getBoundingClientRect().top;
-      const elementPosition = elementRect - bodyRect;
-      const offsetPosition = elementPosition - offset;
+        // --- Iconos SVG directos para evitar errores de importación ---
+        const IconClock = () => (
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        );
+        const IconMapPin = () => (
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+        );
+        const IconInstagram = () => (
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
+        );
 
-      window.scrollTo({
-        top: offsetPosition,
-        behavior: 'smooth'
-      });
-    }
-  };
+        const CATEGORIES = [
+            { id: 'entradas', name: 'Entradas' },
+            { id: 'principales', name: 'Principales' },
+            { id: 'bebidas', name: 'Bebidas' },
+            { id: 'postres', name: 'Postres' },
+        ];
 
-  return (
-    <div className="min-h-screen pb-24">
-      {/* Hero Section */}
-      <header className="relative h-[40vh] flex flex-col items-center justify-center text-center px-6 overflow-hidden">
-        <div className="absolute inset-0 z-0">
-          <img 
-            src="https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&q=80&w=1000" 
-            alt="Restaurant Background"
-            className="w-full h-full object-cover opacity-20"
-            referrerPolicy="no-referrer"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#f5f2ed]" />
-        </div>
-        
-        <motion.div 
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="z-10"
-        >
-          <h1 className="font-serif text-5xl md:text-7xl mb-2 tracking-tight">
-            Bistró <span className="italic">Moderno</span>
-          </h1>
-          <p className="font-sans text-xs uppercase tracking-[0.3em] opacity-60 mb-6">
-            Cocina de Autor & Café de Especialidad
-          </p>
-          <div className="flex items-center justify-center gap-4 text-[#1a1a1a]/40">
-            <div className="flex items-center gap-1 text-[10px]">
-              <Clock size={12} />
-              <span>MAR - DOM | 12:00 - 00:00</span>
-            </div>
-            <div className="flex items-center gap-1 text-[10px]">
-              <MapPin size={12} />
-              <span>PALERMO, CABA</span>
-            </div>
-          </div>
-        </motion.div>
-      </header>
+        const MENU_ITEMS = {
+            entradas: [
+                { id: 1, name: 'Provoleta Ahumada', description: 'Queso provolone fundido con hierbas frescas y aceite de oliva virgen.', price: 4500, image: 'https://lamafia.es/wp-content/uploads/2024/03/provolone-al-horno.png' },
+                { id: 2, name: 'Empanadas de Lomo', description: 'Cortadas a cuchillo, fritas o al horno de barro. Pack de 2 unidades.', price: 3200, image: 'https://tofuu.getjusto.com/orioneat-local/resized2/ncsBkGghkaXzThvow-2400-x.webp' },
+                { id: 3, name: 'Burrata con Rúcula', description: 'Burrata fresca, tomates cherry confitados y pesto de albahaca.', price: 5800, image: 'https://images.unsplash.com/photo-1594007654729-407eedc4be65?auto=format&fit=crop&q=80&w=400' },
+            ],
+            principales: [
+                { id: 4, name: 'Ojo de Bife 400g', description: 'Corte premium a la parrilla con sal de mar y manteca de chimichurri.', price: 12500, image: 'https://images.unsplash.com/photo-1558030006-450675393462?auto=format&fit=crop&q=80&w=400' },
+                { id: 5, name: 'Risotto de Hongos', description: 'Arroz carnaroli, variedad de hongos silvestres y aceite de trufa.', price: 9800, image: 'https://images.unsplash.com/photo-1476124369491-e7addf5db371?auto=format&fit=crop&q=80&w=400' },
+                { id: 6, name: 'Salmón Rosado', description: 'A la plancha con puré de arvejas y vegetales de estación asados.', price: 14200, image: 'https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&q=80&w=400' },
+            ],
+            bebidas: [
+                { id: 7, name: 'Malbec Reserva', description: 'Copa de vino tinto de la casa, notas de frutos rojos y roble.', price: 3500, image: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&q=80&w=400' },
+                { id: 8, name: 'Limonada con Menta', description: 'Fresca, natural, con jengibre y menta fresca.', price: 2200, image: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&q=80&w=400' },
+                { id: 9, name: 'Gin Tonic Botánico', description: 'Gin nacional premium con tónica y rodaja de pomelo.', price: 4800, image: 'https://images.unsplash.com/photo-1551538827-9c037cb4f32a?auto=format&fit=crop&q=80&w=400' },
+            ],
+            postres: [
+                { id: 10, name: 'Volcán de Chocolate', description: 'Corazón fundido con helado de crema americana y frutos del bosque.', price: 3800, image: 'https://images.unsplash.com/photo-1624353365286-3f8d62daad51?auto=format&fit=crop&q=80&w=400' },
+                { id: 11, name: 'Flan Casero', description: 'Con dulce de leche colonial y crema montada.', price: 2900, image: 'https://images.unsplash.com/photo-1528975604071-b4dc52a2d18c?auto=format&fit=crop&q=80&w=400' },
+                { id: 12, name: 'Tiramisú', description: 'Receta tradicional italiana con mascarpone y café espresso.', price: 4200, image: 'https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?auto=format&fit=crop&q=80&w=400' },
+            ],
+        };
 
-      {/* Sticky Navigation */}
-      <nav className={`sticky top-0 z-50 transition-all duration-300 ${isScrolled ? 'bg-[#f5f2ed]/90 backdrop-blur-md shadow-sm' : 'bg-transparent'}`}>
-        <div className="max-w-md mx-auto px-4 py-4 flex gap-2 overflow-x-auto no-scrollbar">
-          {CATEGORIES.map((cat) => (
-            <button
-              key={cat.id}
-              onClick={() => scrollToCategory(cat.id)}
-              className={`flex-shrink-0 px-5 py-2 rounded-full text-sm font-sans transition-all duration-300 ${
-                activeCategory === cat.id 
-                  ? 'bg-[#1a1a1a] text-white' 
-                  : 'bg-white/50 text-[#1a1a1a]/60 border border-[#1a1a1a]/10'
-              }`}
-            >
-              {cat.name}
-            </button>
-          ))}
-        </div>
-      </nav>
-
-      {/* Menu Content */}
-      <main className="max-w-md mx-auto px-4 mt-8 space-y-12">
-        {CATEGORIES.map((category) => (
-          <section key={category.id} id={category.id} className="scroll-mt-32">
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-8 h-[1px] bg-[#1a1a1a]/20" />
-              <h2 className="font-serif text-3xl italic">{category.name}</h2>
-              <div className="flex-1 h-[1px] bg-[#1a1a1a]/20" />
-            </div>
-            <div className="bg-white rounded-2xl shadow-sm border border-[#1a1a1a]/5 overflow-hidden">
-              {MENU_ITEMS[category.id as keyof typeof MENU_ITEMS].map((item) => (
-                <div key={item.id}>
-                  <MenuItem item={item} />
+        const MenuItem = ({ item }) => (
+            <div className="flex gap-4 p-4 border-b border-[#1a1a1a]/10 last:border-0 group animate-fade-in">
+                <div className="flex-1">
+                    <div className="flex justify-between items-start mb-1">
+                        <h3 className="font-serif text-xl font-medium group-hover:text-[#5A5A40] transition-colors">{item.name}</h3>
+                        <span className="font-sans font-semibold text-sm whitespace-nowrap ml-2">$ {item.price.toLocaleString('es-AR')}</span>
+                    </div>
+                    <p className="text-sm text-[#1a1a1a]/60 font-sans leading-relaxed">{item.description}</p>
                 </div>
-              ))}
+                <div className="w-24 h-24 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100">
+                    <img src={item.image} alt={item.name} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" referrerPolicy="no-referrer" />
+                </div>
             </div>
-          </section>
-        ))}
-      </main>
+        );
 
-      {/* Footer Info */}
-      <footer className="max-w-md mx-auto px-6 mt-20 text-center pb-12">
-        <div className="w-12 h-12 border border-[#1a1a1a]/10 rounded-full flex items-center justify-center mx-auto mb-6">
-          <Instagram size={20} className="text-[#1a1a1a]/60" />
-        </div>
-        <p className="font-serif text-lg italic mb-2">Gracias por visitarnos</p>
-        <p className="font-sans text-[10px] uppercase tracking-widest opacity-40">
-          © 2024 Bistró Moderno • Buenos Aires
-        </p>
-      </footer>
+        function App() {
+            const [activeCategory, setActiveCategory] = useState('entradas');
+            const [isScrolled, setIsScrolled] = useState(false);
 
-      {/* Custom Styles for no-scrollbar */}
-      <style>{`
-        .no-scrollbar::-webkit-scrollbar {
-          display: none;
+            useEffect(() => {
+                const handleScroll = () => {
+                    setIsScrolled(window.scrollY > 100);
+                    const sections = CATEGORIES.map(cat => document.getElementById(cat.id));
+                    const scrollPosition = window.scrollY + 150;
+                    for (let i = sections.length - 1; i >= 0; i--) {
+                        const section = sections[i];
+                        if (section && section.offsetTop <= scrollPosition) {
+                            setActiveCategory(CATEGORIES[i].id);
+                            break;
+                        }
+                    }
+                };
+                window.addEventListener('scroll', handleScroll);
+                return () => window.removeEventListener('scroll', handleScroll);
+            }, []);
+
+            const scrollToCategory = (id) => {
+                const element = document.getElementById(id);
+                if (element) {
+                    window.scrollTo({ top: element.offsetTop - 120, behavior: 'smooth' });
+                }
+            };
+
+            return (
+                <div className="min-h-screen pb-24">
+                    <header className="relative h-[40vh] flex flex-col items-center justify-center text-center px-6 overflow-hidden">
+                        <div className="absolute inset-0 z-0">
+                            <img src="https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&q=80&w=1000" className="w-full h-full object-cover opacity-20" referrerPolicy="no-referrer" />
+                            <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#f5f2ed]" />
+                        </div>
+                        <div className="z-10 animate-fade-in">
+                            <h1 className="font-serif text-5xl md:text-7xl mb-2 tracking-tight">Bistró <span className="italic">Moderno</span></h1>
+                            <p className="font-sans text-xs uppercase tracking-[0.3em] opacity-60 mb-6">Cocina de Autor & Café de Especialidad</p>
+                            <div className="flex items-center justify-center gap-4 text-[#1a1a1a]/40">
+                                <div className="flex items-center gap-1 text-[10px]"><IconClock /><span>MAR - DOM | 12:00 - 00:00</span></div>
+                                <div className="flex items-center gap-1 text-[10px]"><IconMapPin /><span>PALERMO, CABA</span></div>
+                            </div>
+                        </div>
+                    </header>
+
+                    <nav className={`sticky top-0 z-50 transition-all duration-300 ${isScrolled ? 'bg-[#f5f2ed]/90 backdrop-blur-md shadow-sm' : 'bg-transparent'}`}>
+                        <div className="max-w-md mx-auto px-4 py-4 flex gap-2 overflow-x-auto no-scrollbar">
+                            {CATEGORIES.map((cat) => (
+                                <button key={cat.id} onClick={() => scrollToCategory(cat.id)} className={`flex-shrink-0 px-5 py-2 rounded-full text-sm font-sans transition-all duration-300 ${activeCategory === cat.id ? 'bg-[#1a1a1a] text-white' : 'bg-white/50 text-[#1a1a1a]/60 border border-[#1a1a1a]/10'}`}>{cat.name}</button>
+                            ))}
+                        </div>
+                    </nav>
+
+                    <main className="max-w-md mx-auto px-4 mt-8 space-y-12">
+                        {CATEGORIES.map((category) => (
+                            <section key={category.id} id={category.id} className="scroll-mt-32">
+                                <div className="flex items-center gap-3 mb-6">
+                                    <div className="w-8 h-[1px] bg-[#1a1a1a]/20" />
+                                    <h2 className="font-serif text-3xl italic">{category.name}</h2>
+                                    <div className="flex-1 h-[1px] bg-[#1a1a1a]/20" />
+                                </div>
+                                <div className="bg-white rounded-2xl shadow-sm border border-[#1a1a1a]/5 overflow-hidden">
+                                    {MENU_ITEMS[category.id].map((item) => (
+                                        <MenuItem key={item.id} item={item} />
+                                    ))}
+                                </div>
+                            </section>
+                        ))}
+                    </main>
+
+                    <footer className="max-w-md mx-auto px-6 mt-20 text-center pb-12">
+                        <div className="w-12 h-12 border border-[#1a1a1a]/10 rounded-full flex items-center justify-center mx-auto mb-6"><IconInstagram /></div>
+                        <p className="font-serif text-lg italic mb-2">Gracias por visitarnos</p>
+                        <p className="font-sans text-[10px] uppercase tracking-widest opacity-40">© 2024 Bistró Moderno • Buenos Aires</p>
+                    </footer>
+                </div>
+            );
         }
-        .no-scrollbar {
-          -ms-overflow-style: none;
-          scrollbar-width: none;
-        }
-      `}</style>
-    </div>
-  );
-}
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
